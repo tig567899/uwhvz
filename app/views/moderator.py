@@ -668,14 +668,19 @@ class DeleteFactionsView(View):
 
         for modifier in modifiers:
             if str(modifier.id) + "-remove" in request.POST:
-                modifier.delete()
-                messages.success(request, f"Successfully deleted modifier {modifier}.")
-                if modifier.faction.modifier_set.count() == 0:
-                    if modifier.faction.player_set.count() == 0:
-                        modifier.faction.delete()
-                        messages.success(request, f"Successfully deleted faction {modifier.faction}.")
-                    else:
-                        message.error(request, f"Failed to delete faction {modifier.faction} since players are still a part of it.")
+                modifier_count = modifier.faction.modifier_set.count()
+
+                if modifier_count > 1:
+                    modifier.delete()
+                    messages.success(request, f"Successfully deleted modifier {modifier}.")
+                    break
+
+                if modifier.faction.player_set.count() == 0:
+                    modifier.delete()
+                    modifier.faction.delete()
+                    messages.success(request, f"Successfully deleted faction {modifier.faction}.")
+                else:
+                    messages.error(request, f"Failed to delete modifier and faction {modifier.faction} since players are still a part of it.")
 
         return redirect('manage_factions')
 
@@ -739,18 +744,25 @@ class ManageFactionsView(View):
             cleaned_data = mod_add_player_to_faction_form.cleaned_data
             player, faction = cleaned_data['player'], cleaned_data['faction']
 
+
             try:
                 player_object = Player.objects.get(id=player, game=game)
-                faction_object = Faction.objects.get(id=faction, game=game)
-                player_object.faction = faction_object
-                player_object.save()
-                messages.success(request, f"Updated player faction successfully.")
+                # for clearing a player's faction
+                if (faction == ''):
+                    player_object.faction = None
+                    player_object.save()
+                    messages.success(request, f"Updated player faction successfully.")
+                else:
+                    faction_object = Faction.objects.get(id=faction, game=game)
+                    player_object.faction = faction_object
+                    player_object.save()
+                    messages.success(request, f"Updated player faction successfully.")
             except:
                 messages.error(request, f"There was an error in setting the players faction.")
         elif 'add-modifier' in request.POST:
             mod_add_modifier_form = AddModifierForm(request.POST)
             if not mod_add_modifier_form.is_valid():
-                return self.render.manage_factions(request, mod_add_modifier_form=mod_add_modifier_form)
+                return self.render_manage_factions(request, mod_add_modifier_form=mod_add_modifier_form)
 
             cleaned_data = mod_add_modifier_form.cleaned_data
             faction, modifier_type, amount = cleaned_data['faction'], cleaned_data['modifier_type'], cleaned_data['amount']

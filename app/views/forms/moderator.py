@@ -18,7 +18,9 @@ def get_users():
     return ((x.id, f'{x.get_full_name()} - {x.email}') for x in User.objects.filter(is_active=True))
 
 def get_factions():
-    return ((x.id, x) for x in Faction.objects.filter(game=most_recent_game()))
+    choices = [(u'', u'----------')]
+    choices.extend([(x.id, x) for x in Faction.objects.filter(game=most_recent_game())])
+    return choices
 
 def get_users_legacy():
     users = User.objects.filter(is_active=True).order_by('-user_legacy','first_name').distinct()
@@ -392,6 +394,7 @@ class AddPlayerToFactionForm(forms.Form):
     faction = forms.ChoiceField(
         label="Faction",
         choices=get_factions,
+        required=False,
         widget=forms.Select(
             attrs={
                 'class': 'custom-select',
@@ -402,7 +405,7 @@ class AddPlayerToFactionForm(forms.Form):
 class AddFactionForm(forms.Form):
     name = forms.CharField(
         label="Name of the Faction",
-        help_text="If a faction with this name is already present in the current game, we'll update it instead of creating a new faction.",
+        help_text="If a faction with this name is already present in the current game, we'll update its name and description instead of creating a new faction. Note that this won't change its modifiers.",
         widget=forms.TextInput(
             attrs={
                 'class': 'ui-input',
