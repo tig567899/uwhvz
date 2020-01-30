@@ -664,13 +664,18 @@ class DeleteFactionsView(View):
 
     def post(self, request):
         game = most_recent_game()
-        factions = Faction.objects.filter(game=game)
+        modifiers = Modifier.objects.all()
 
-        for faction in factions:
-            if str(faction.id) + "-remove" in request.POST:
-                faction.modifier_set.all()[0].delete()
-                faction.delete()
-                messages.success(request, f"Successfully deleted faction {faction}.")
+        for modifier in modifiers:
+            if str(modifier.id) + "-remove" in request.POST:
+                modifier.delete()
+                messages.success(request, f"Successfully deleted modifier {modifier}.")
+                if modifier.faction.modifier_set.count() == 0:
+                    if modifier.faction.player_set.count() == 0:
+                        modifier.faction.delete()
+                        messages.success(request, f"Successfully deleted faction {modifier.faction}.")
+                    else:
+                        message.error(request, f"Failed to delete faction {modifier.faction} since players are still a part of it.")
 
         return redirect('manage_factions')
 
@@ -679,18 +684,19 @@ class ManageFactionsView(View):
     template_name = "dashboard/moderator/manage_factions.html"
 
     def render_manage_factions(self, request, mod_add_player_to_faction_form=AddPlayerToFactionForm(),
-                               mod_add_faction_form=AddFactionForm()):
+                               mod_add_faction_form=AddFactionForm(), mod_add_modifier_form=AddModifierForm()):
         game = most_recent_game()
         human_players = Player.objects.filter(game=game, role=PlayerRole.HUMAN, active=True).order_by('user__first_name')
         factions = Faction.objects.filter(game=game)
-        modifiers = map(lambda f: f.modifier_set.all()[0].detail(), factions)
+        modifiers = map(lambda f: f.modifier_set.all(), factions)
         return render(request, self.template_name, {
             'game': game,
             'participant': request.user.participant(game),
             'humans': human_players,
             'factions': zip(factions, modifiers),
             'mod_add_player_to_faction_form': mod_add_player_to_faction_form,
-            'mod_add_faction_form': mod_add_faction_form
+            'mod_add_faction_form': mod_add_faction_form,
+            'mod_add_modifier_form': mod_add_modifier_form
         })
 
     def get(self, request):
@@ -708,13 +714,8 @@ class ManageFactionsView(View):
             # update if possible
             try:
                 faction = Faction.objects.get(game=game, name=name)
-                modifier = Modifier.objects.get(faction=faction)
                 faction.description = description
                 faction.save()
-
-                modifier.modifier_type = modifier_type
-                modifier.amount = amount
-                modifier.save()
 
                 messages.success(request, f"Updated faction successfully.")
                 return redirect ('manage_factions')
@@ -725,7 +726,8 @@ class ManageFactionsView(View):
             # else create
             try: 
                 faction = Faction.objects.create_faction(game, name, description)
-                modifier = Modifier.objects.create_modifier(faction, modifier_type, amount)
+                if modifier_type and amount:
+                    Modifier.objects.create_modifier(faction, modifier_type, amount)
                 messages.success(request, f"Created faction successfully.")
             except:
                 messages.error(request, f"There was an error in creating the faction.")
@@ -745,6 +747,20 @@ class ManageFactionsView(View):
                 messages.success(request, f"Updated player faction successfully.")
             except:
                 messages.error(request, f"There was an error in setting the players faction.")
+        elif 'add-modifier' in request.POST:
+            mod_add_modifier_form = AddModifierForm(request.POST)
+            if not mod_add_modifier_form.is_valid():
+                return self.render.manage_factions(request, mod_add_modifier_form=mod_add_modifier_form)
+
+            cleaned_data = mod_add_modifier_form.cleaned_data
+            faction, modifier_type, amount = cleaned_data['faction'], cleaned_data['modifier_type'], cleaned_data['amount']
+            try: 
+                faction_object = Faction.objects.get(id=faction, game=game)
+                Modifier.objects.create_modifier(faction_object, modifier_type, amount)
+                messages.success(request, f"Created modifier successfully.")
+            except Exception as e:
+                print(e)
+                messages.error(request, f"Failed to create modifier.")
 
         return redirect('manage_factions')
 

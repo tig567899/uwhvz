@@ -14,9 +14,6 @@ class ModifierType(Enum):
 
 class ModifierManager(models.Manager):
     def create_modifier(self, faction: Faction, modifier_type: ModifierType, modifier_amount: int) -> "Modifier":
-        if Modifier.objects.filter(faction=faction):
-            raise ValueError(f"The faction {faction} already has a modifier in this game.")
-
         modifier = self.model(faction=faction, modifier_type=modifier_type, modifier_amount=modifier_amount)
         modifier.save()
 

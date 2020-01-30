@@ -422,6 +422,37 @@ class AddFactionForm(forms.Form):
     )
     modifier_type = EnumField(ModifierType, max_length=1).formfield(
         label="Modifier",
+        required=False,
+        widget=forms.Select(
+            attrs={
+                'class': 'custom-select',
+            }
+        ),
+    )
+    amount = forms.IntegerField(
+        label="Amount",
+        required=False,
+        min_value=0,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'ui-input',
+                'input_type':'number'
+            }
+        )
+    )
+
+class AddModifierForm(forms.Form):
+    faction = forms.ChoiceField(
+        label="Faction",
+        choices=get_factions,
+        widget=forms.Select(
+            attrs={
+                'class': 'custom-select',
+            }
+        )
+    )
+    modifier_type = EnumField(ModifierType, max_length=1).formfield(
+        label="Modifier",
         widget=forms.Select(
             attrs={
                 'class': 'custom-select',
