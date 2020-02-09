@@ -138,8 +138,8 @@
   padding-top: 8rem;
 }
 
-.ui-layout .mission_details {
-  height: 100%;
+.ui-layout > .mission-details {
+  min-height: 100vh;
 }
 
 footer {
