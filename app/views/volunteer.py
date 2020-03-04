@@ -17,7 +17,7 @@ class SignupPlayersView(View):
     def render_signup_players(self, request, volunteer_signup_player_form=VolunteerSignupPlayerForm()):
         game = most_recent_game()
         locations = SignupLocation.objects.filter(game=game)
-        players = Player.objects.filter(game=game, active=True).count()
+        player_count = Player.objects.filter(game=game, active=True).count()
         used_signups = SignupInvite.objects.filter(game=game,used_at__isnull=False).order_by('user_at')
         
         data = [{x: index, y: item} for index, item in enumerate(used_signups)]
