@@ -49,6 +49,53 @@
       {% endfor %}
       </tbody>
     </table>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">Self registration</th>
+        <th scope="col">Total registration</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td scope="col">{{ player_count - sum([loc.signupinvite_set.filter(used_at__isnull=False).count() for loc in locations]) }}</td>
+        <td scope="col">{{ player_count }}</td>
+      </tr>
+      </tbody>
+    </table>
+  {% endcall %}
+  {% call card("Signup Graph") %}
+  <div id="container" style="width: 75%;">
+    <canvas id="signup-graph"></canvas>
+  </div>
+
   {% endcall %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+
+    var config = {
+      type: 'line',
+      data: {
+        datasets: [{
+          data: {{ data|safe }},
+          backgroundColor: [
+            '#696969', '#808080', '#A9A9A9', '#C0C0C0', '#D3D3D3'
+          ]
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    };
+
+    window.onload = function() {
+      var ctx = document.getElementById('signup-graph').getContext('2d');
+      window.graph = new Chart(ctx, config);
+    };
+
+  </script>
 {% endblock %}

@@ -4,7 +4,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from app.mail import send_signup_email
-from app.models import SignupInvite, SignupLocation
+from app.models import SignupInvite, SignupLocation, Player
 from app.util import volunteer_required, most_recent_game, signups_game_required
 from .forms import VolunteerSignupPlayerForm
 
@@ -17,12 +17,18 @@ class SignupPlayersView(View):
     def render_signup_players(self, request, volunteer_signup_player_form=VolunteerSignupPlayerForm()):
         game = most_recent_game()
         locations = SignupLocation.objects.filter(game=game)
+        players = Player.objects.filter(game=game, active=True).count()
+        used_signups = SignupInvite.objects.filter(game=game,used_at__isnull=False).order_by('user_at')
+        
+        data = [{x: index, y: item} for index, item in enumerate(used_signups)]
 
         return render(request, self.template_name, {
             'game': game,
             'participant': request.user.participant(game),
             'signup_locations': locations,
             'volunteer_signup_player_form': volunteer_signup_player_form,
+            'player_count':player_count,
+            'data':data,
         })
 
     def get(self, request):
