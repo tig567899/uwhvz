@@ -14,7 +14,8 @@ from app.util import most_recent_game, running_game_required, player_required, g
     participant_required
 from app.views.forms import ReportTagForm, ClaimSupplyCodeForm, MessagePlayersForm
 
-from pytz import timezone
+from pytz import timezone, utc
+from datetime import datetime
 
 
 def render_player_info(request, report_tag_form=ReportTagForm(), claim_supply_code_form=ClaimSupplyCodeForm()):
@@ -70,6 +71,10 @@ class ReportTagView(View):
 
         cleaned_data = report_tag_form.cleaned_data
         receiver_code = cleaned_data['player_code'].upper()
+        
+        if cleaned_data['datetime'].replace(tzinfo=timezone('Canada/Eastern')) > datetime.utcnow().replace(tzinfo=timezone('Canada/Eastern')):
+            report_tag_form.add_error('datetime', "You can't tag someone in the future!")
+            return render_player_info(request, report_tag_form=report_tag_form)            
 
         try:
             receiving_player = Player.objects.get(code=receiver_code, active=True)
