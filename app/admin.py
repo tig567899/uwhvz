@@ -16,6 +16,14 @@ def get_legacy(self, instance):
     return instance.user.legacy_points
 get_legacy.short_description = 'Legacy Points'
 
+def set_stun(ModelAdmin, request, queryset):
+    queryset.update(type=TagType.STUN)
+set_stun.short_description = "Set Tag to Stun"
+
+def set_kill(ModelAdmin, request, queryset):
+    queryset.update(type=TagType.KILL)
+set_kill.short_description = "Set Tag to Kill"
+
 class UserAdmin(UserAdmin):
     add_form = UserCreationForm
     form = UserChangeForm
