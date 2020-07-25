@@ -7,7 +7,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import Group
 
 from app.mail import send_signup_email, send_signup_reminder, send_start_email
-from app.models import Player, SignupInvite, SignupLocation, SupplyCode, PlayerRole, Spectator, Moderator, Purchase, Game, User, Legacy, Tag, Faction, Modifier
+from app.models import Player, SignupInvite, SignupLocation, SupplyCode, PlayerRole, Spectator, Moderator, Purchase, Game, User, Legacy, Tag, Faction, Modifier, Email, EmailRule
 from app.util import moderator_required, most_recent_game, running_game_required, get_game_participants, necromancer_required
 from app.views.forms import *
 
@@ -196,11 +196,14 @@ class ManageGameView(View):
             msg.send()
 
         if cd['recipients'] == "All":
+            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ALL,game)
             messages.success(request, "You've sent an email to all players.")
         elif cd['recipients'] == "Zombies":
             messages.success(request, "You've sent an email to all zombies.")
+            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ZOMBIE,game)
         elif cd['recipients'] == "Humans":
             messages.success(request, "You've sent an email to all humans.")
+            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.HUMAN,game)
         elif cd['recipients'] == "Self":
             messages.success(request, "You've sent an email to yourself.")
 

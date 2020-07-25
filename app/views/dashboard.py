@@ -9,7 +9,7 @@ from time import mktime
 from datetime import datetime
 
 from app.util import MobileSupportedView, most_recent_game
-from app.models import Game, Tag, Player, PlayerRole, SignupLocation, Legacy, SupplyCode, User
+from app.models import Game, Tag, Player, PlayerRole, SignupLocation, Legacy, SupplyCode, User, Email, EmailRule
 
 
 class IndexView(MobileSupportedView):
@@ -33,11 +33,19 @@ class DashboardView(MobileSupportedView):
 
     def get(self, request):
         game = most_recent_game()
+        participant = request.user.participant(game)
         stuns = Tag.objects.filter(initiator__user=request.user,initiator__role=PlayerRole.HUMAN,
             receiver__role=PlayerRole.ZOMBIE,active=True).count()
         kills = Tag.objects.filter(initiator__user=request.user,initiator__role=PlayerRole.ZOMBIE,
             receiver__role=PlayerRole.HUMAN,active=True).count()
         codes = SupplyCode.objects.filter(claimed_by__user=request.user,active=True).count()
+        
+        if participant.is_human:
+            emails = Email.objects.filter(game=game).exclude(rule=EmailRule.ZOMBIE)
+        elif participant.is_zombie:
+            emails = Email.objects.filter(game=game).exclude(rule=EmailRule.HUMAN)
+        else:
+            emails = Email.objects.filter(game=game)         
 
         points_accu = sum(Legacy.objects.filter(user=request.user,value__gt=0).values_list('value', flat=True))
         points_for_permanent = 8
@@ -46,8 +54,8 @@ class DashboardView(MobileSupportedView):
                 receiver__game=game,active=False).count()
             if unverified:
                 messages.error(request, f"There are {unverified} tags that require verification")
-        return self.mobile_or_desktop(request, {'game': game, 'participant': request.user.participant(game),
-                                                'stuns':stuns, 'kills':kills, 'codes':codes,
+        return self.mobile_or_desktop(request, {'game': game, 'participant': participant,
+                                                'stuns':stuns, 'kills':kills, 'codes':codes, 'emails':emails,
                                                 'points_accu':points_accu, 'points_for_permanent':points_for_permanent})
 
     def post(self, request):
