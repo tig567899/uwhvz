@@ -24,6 +24,7 @@
   <div class="ui-grid align-content-start">
   
   {% if emails %}
+  {% call card("Emails Sent This Game") %}
         <table class="table table-striped">
           <thead>
           <tr>
@@ -61,6 +62,7 @@
           {% endfor %}
           </tbody>
         </table>
+  {% endcall %}
   {% endif %}
   
     {% if not game.is_finished and participant.is_player and participant.user.legacy_points() %}

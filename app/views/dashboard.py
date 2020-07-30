@@ -40,9 +40,9 @@ class DashboardView(MobileSupportedView):
             receiver__role=PlayerRole.HUMAN,active=True).count()
         codes = SupplyCode.objects.filter(claimed_by__user=request.user,active=True).count()
         
-        if participant.is_human:
+        if participant.is_human and game.is_running:
             emails = Email.objects.filter(game=game).exclude(rule=EmailRule.ZOMBIE)
-        elif participant.is_zombie:
+        elif participant.is_zombie and game.is_running:
             emails = Email.objects.filter(game=game).exclude(rule=EmailRule.HUMAN)
         else:
             emails = Email.objects.filter(game=game)         
