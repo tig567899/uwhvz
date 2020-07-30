@@ -306,7 +306,8 @@ class StunVerificationView(View):
             receiver__game=game, type=Tag.KILL, receiver=tag.receiver)
             if similar_objects:
                 questionable_stuns.append(tag)
-                questionable_stuns.extend(similar_objects)
+                for similar in similar_objects:
+                    questionable_stuns.append(similar)
         tz = timezone('Canada/Eastern')
 
         return render(request, self.template_name, {
