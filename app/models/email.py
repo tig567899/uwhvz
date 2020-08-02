@@ -13,8 +13,8 @@ class EmailRule(Enum):
 
 
 class EmailManager(models.Manager):
-    def create_email(self, name: str, data : str, rule: EmailRule, game: Game) -> 'Email':
-        email = self.model(name=name, data=data, rule=rule, game=game)
+    def create_email(self, name: str, data : str, rule: EmailRule, game: Game, **extra_fields) -> 'Email':
+        email = self.model(name=name, data=data, rule=rule, game=game, **extra_fields)
         email.save()
         return signup_location
 
@@ -25,6 +25,7 @@ class Email(models.Model):
     name: str = models.CharField()
     data: str = models.CharField()
     rule: Enum = EnumField(enum=EmailRule, max_length=1)
+    player_made: bool = models.BooleanField(default=False)
 
     created_at: datetime = models.DateTimeField(auto_now_add=True)
     modified_at: datetime = models.DateTimeField(auto_now=True)

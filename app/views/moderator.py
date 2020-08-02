@@ -199,11 +199,11 @@ class ManageGameView(View):
             email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ALL,game)
             messages.success(request, "You've sent an email to all players.")
         elif cd['recipients'] == "Zombies":
-            messages.success(request, "You've sent an email to all zombies.")
             email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ZOMBIE,game)
+            messages.success(request, "You've sent an email to all zombies.")
         elif cd['recipients'] == "Humans":
-            messages.success(request, "You've sent an email to all humans.")
             email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.HUMAN,game)
+            messages.success(request, "You've sent an email to all humans.")
         elif cd['recipients'] == "Self":
             messages.success(request, "You've sent an email to yourself.")
 

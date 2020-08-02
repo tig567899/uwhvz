@@ -9,7 +9,7 @@ from django.views import View
 from rest_framework.utils import json
 
 from app.mail import send_tag_email, send_stun_email
-from app.models import Player, PlayerRole, Tag, SupplyCode, Modifier, ModifierType, Spectator, Moderator
+from app.models import Player, PlayerRole, Tag, SupplyCode, Modifier, ModifierType, Spectator, Moderator, Email, EmailRule
 from app.util import most_recent_game, running_game_required, player_required, get_game_participants, game_required, \
     participant_required
 from app.views.forms import ReportTagForm, ClaimSupplyCodeForm, MessagePlayersForm
@@ -263,8 +263,10 @@ class MessagePlayersView(View):
         ).send()
 
         if cd['recipients'] == "All":
+            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ALL,game,player_made=True)
             messages.success(request, "You've sent an email to all players.")
         elif cd['recipients'] == "Zombies":
+            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ZOMBIE,game,player_made=True)
             messages.success(request, "You've sent an email to all zombies.")
         return redirect('message_players')
 
