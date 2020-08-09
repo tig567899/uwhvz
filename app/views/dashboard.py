@@ -85,7 +85,15 @@ class DashboardView(MobileSupportedView):
 
 class MissionsView(MobileSupportedView):
     desktop_template = "missions.html"
-    mobile_template = "missions.html"
+    mobile_template = "missions.html"    
+
+    def get(self, request):
+        game = most_recent_game()
+        return self.mobile_or_desktop(request, {'game': game})
+    
+class NewPlayerGuideView(MobileSupportedView):
+    desktop_template = "new_player_guide.html"
+    mobile_template = "new_player_guide.html"    
 
     def get(self, request):
         game = most_recent_game()
