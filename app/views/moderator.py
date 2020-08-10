@@ -7,7 +7,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import Group
 
 from app.mail import send_signup_email, send_signup_reminder, send_start_email
-from app.models import Player, SignupInvite, SignupLocation, SupplyCode, PlayerRole, Spectator, Moderator, Purchase, Game, User, Legacy, Tag, Faction, Modifier, Email, EmailRule
+from app.models import Player, SignupInvite, SignupLocation, SupplyCode, PlayerRole, Spectator, Moderator, Purchase, Game, User, Legacy, Tag, TagType, Faction, Modifier, Email, EmailRule
 from app.util import moderator_required, most_recent_game, running_game_required, get_game_participants, necromancer_required
 from app.views.forms import *
 
