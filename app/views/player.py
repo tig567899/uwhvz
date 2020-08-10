@@ -16,6 +16,14 @@ from app.views.forms import ReportTagForm, ClaimSupplyCodeForm, MessagePlayersFo
 
 from pytz import timezone
 
+import io
+from django.http import FileResponse
+from reportlab.platypus import Table, TableStyle, SimpleDocTemplate
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+pdfmetrics.registerFont(TTFont('VeraBd', 'VeraBd.ttf'))
+
 
 def render_player_info(request, report_tag_form=ReportTagForm(), claim_supply_code_form=ClaimSupplyCodeForm()):
     template_name = "mobile/dashboard/player.html" if request.user_agent.is_mobile else "dashboard/player.html"
@@ -31,6 +39,40 @@ def render_player_info(request, report_tag_form=ReportTagForm(), claim_supply_co
         'report_tag_form': report_tag_form,
         'claim_supply_code_form': claim_supply_code_form,
     })
+
+@method_decorator(game_required, name='dispatch')
+@method_decorator(login_required, name='dispatch')
+class PlayerCodeView(View):
+    def get(self, request):
+        player = request.user.participant(most_recent_game())
+        # Create a file-like buffer to receive PDF data.
+        buffer = io.BytesIO()
+    
+        # Create the PDF object, using the buffer as its "file."
+        p = SimpleDocTemplate(buffer, topMargin=1)
+        width, height = letter # Save these for later
+    
+        elements = []
+        data=[(player.code,)*2]*7
+        table = Table(data, colWidths=270, rowHeights=105)
+        table.setStyle(TableStyle([('FACE',(0,0),(7,7),'VeraBd'),
+                                   ('SIZE',(0,0),(7,7),45),
+                                   ('TOPPADDING',(0,0),(7,7),15),
+                                   ('BOTTOMPADDING',(0,0),(7,7),15),
+                                   ('ALIGN',(0,0),(7,7),'CENTER'),
+                                   ('VALIGN',(0,0),(7,7),'MIDDLE')]))
+        
+        elements.append(table)
+        p.build(elements)            
+    
+        # Close the PDF object cleanly, and we're done.
+        p.showPage()
+        p.save()
+    
+        # FileResponse sets the Content-Disposition header so that browsers
+        # present the option to save the file.
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename=f'{request.user.first_name}_code.pdf')
 
 
 @method_decorator(game_required, name='dispatch')
