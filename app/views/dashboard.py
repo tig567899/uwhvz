@@ -42,9 +42,9 @@ class DashboardView(MobileSupportedView):
         
         if participant.is_player and game.is_running:
             if participant.is_human:
-                emails = Email.objects.filter(game=game).exclude(rule=RecipientGroup.ZOMBIE)
+                emails = Email.objects.filter(game=game).exclude(group=RecipientGroup.ZOMBIE)
             elif participant.is_zombie:
-                emails = Email.objects.filter(game=game).exclude(rule=RecipientGroup.HUMAN)
+                emails = Email.objects.filter(game=game).exclude(group=RecipientGroup.HUMAN)
         else:
             emails = Email.objects.filter(game=game)         
 

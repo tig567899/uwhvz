@@ -23,7 +23,7 @@
 <div class="ui-grid s-dashboard__game-info align-content-start">
   <div class="ui-grid align-content-start">
   
-  {% if emails.exclude(player_made) %}
+  {% if emails.exclude(player_made=True) %}
   {% call card("Mod Emails") %}
         <table class="table table-striped">
           <thead>
@@ -34,7 +34,7 @@
           </tr>
           </thead>
           <tbody>
-          {% for email in emails.exclude(player_made) %}
+          {% for email in emails.exclude(player_made=True) %}
             <tr>
               <td data-toggle="tooltip" data-placement="top" title="{{ email.name }}">{{ email.name }}</td>
               <td>{{ email.created_at }}</td>
@@ -65,8 +65,8 @@
   {% endcall %}
   {% endif %}
   
-  {% if emails.filter(player_made) %}
-  {% call card("Mod Emails") %}
+  {% if emails.filter(player_made=True) %}
+  {% call card("Player Emails") %}
         <table class="table table-striped">
           <thead>
           <tr>
@@ -76,7 +76,7 @@
           </tr>
           </thead>
           <tbody>
-          {% for email in emails.filter(player_made) %}
+          {% for email in emails.filter(player_made=True) %}
             <tr>
               <td data-toggle="tooltip" data-placement="top" title="{{ email.name }}">{{ email.name }}</td>
               <td>{{ email.created_at }}</td>
