@@ -22,6 +22,7 @@ from django.http import FileResponse
 from reportlab.platypus import Table, TableStyle, SimpleDocTemplate
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.pagesizes import letter
 
 pdfmetrics.registerFont(TTFont('VeraBd', 'VeraBd.ttf'))
 
