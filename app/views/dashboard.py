@@ -91,6 +91,13 @@ class MissionsView(MobileSupportedView):
     def get(self, request):
         game = most_recent_game()
         return self.mobile_or_desktop(request, {'game': game})
+
+class MinecraftView(MobileSupportedView):
+    template_name = "minecraft.html"   
+
+    def get(self, request):
+        game = most_recent_game()
+        return self.mobile_or_desktop(request, {'game': game})
     
 class NewPlayerGuideView(MobileSupportedView):
     desktop_template = "new_player_guide.html"
