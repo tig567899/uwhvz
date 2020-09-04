@@ -68,8 +68,8 @@ class PlayerCodeView(View):
         p.build(elements)            
     
         # Close the PDF object cleanly, and we're done.
-        p.showPage()
-        p.save()
+        #p.showPage()
+        #p.save()
     
         # FileResponse sets the Content-Disposition header so that browsers
         # present the option to save the file.
@@ -90,11 +90,11 @@ class PlayerInfoView(View):
         return render_player_info(request)
 
     def post(self, request):
-        if 'is_score_public' in request.POST:
-            is_score_public = request.POST.get('is_score_public', 'off') == 'on'
-            player = request.user.participant(most_recent_game())
-            player.is_score_public = is_score_public
-            player.save()
+        is_score_public = request.POST.get('is_score_public', 'off') == 'on'
+        player = request.user.participant(most_recent_game())
+        player.is_score_public = is_score_public
+        player.save()
+        messages.success(request, f"Your score is now {'public' if is_score_public else 'private'}.")
         return render_player_info(request)
 
 
@@ -311,10 +311,10 @@ class MessagePlayersView(View):
         ).send()
 
         if cd['recipients'] == "All":
-            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ALL,game,player_made=True)
+            email = Email.objects.create_email(f"{subject_set} Message from {request.user.get_full_name()}",cd['message'],RecipientGroup.ALL,game,player_made=True)
             messages.success(request, "You've sent an email to all players.")
         elif cd['recipients'] == "Zombies":
-            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ZOMBIE,game,player_made=True)
+            email = Email.objects.create_email(f"{subject_set} Message from {request.user.get_full_name()}",cd['message'],RecipientGroup.ZOMBIE,game,player_made=True)
             messages.success(request, "You've sent an email to all zombies.")
         return redirect('message_players')
 

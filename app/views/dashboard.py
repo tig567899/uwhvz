@@ -34,13 +34,11 @@ class DashboardView(MobileSupportedView):
     def get(self, request):
         game = most_recent_game()
         participant = request.user.participant(game)
-        stuns = Tag.objects.filter(initiator__user=request.user,initiator__role=PlayerRole.HUMAN,
-            receiver__role=PlayerRole.ZOMBIE,active=True).count()
-        kills = Tag.objects.filter(initiator__user=request.user,initiator__role=PlayerRole.ZOMBIE,
-            receiver__role=PlayerRole.HUMAN,active=True).count()
+        stuns = Tag.objects.filter(initiator__user=request.user,type=TagType.STUN,active=True).count()
+        kills = Tag.objects.filter(initiator__user=request.user,type=TagType.KILL,active=True).count()
         codes = SupplyCode.objects.filter(claimed_by__user=request.user,active=True).count()
         
-        if participant.is_player and game.is_running:
+        if participant and participant.is_player and game.is_running:
             if participant.is_human:
                 emails = Email.objects.filter(game=game).exclude(group=RecipientGroup.ZOMBIE)
             elif participant.is_zombie:
@@ -93,7 +91,8 @@ class MissionsView(MobileSupportedView):
         return self.mobile_or_desktop(request, {'game': game})
 
 class MinecraftView(MobileSupportedView):
-    template_name = "minecraft.html"   
+    desktop_template = "minecraft.html"
+    mobile_template = "minecraft.html"
 
     def get(self, request):
         game = most_recent_game()

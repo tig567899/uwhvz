@@ -11,9 +11,15 @@
 {% block subcontent %}
 <div class="ui-grid s-dashboard__index">
   <div class="ui-grid">
-    {% call card("My Code") %}
-    <a href="{{ url('player_code') }}">participant.code</a>
-    {% endcall %}
+    <div class="ui-card ui-card--display">
+    <div class="ui-card__header">
+      <h1 class="ui-card__title">My Code</h1>
+    </div>
+    <div class="ui-card__content">
+      <a href="{{ url('player_code') }}" style="color: #000000">{{ participant.code }}</a>
+    </div>
+  </div>
+
     {{ card("My Score", participant.shop_score(), "ui-card--display") }}
     {{ card("Team", participant.role, "ui-card--display") }}
     {{ card("Team Score", team_score, "ui-card--display") }}
@@ -76,7 +82,7 @@
       <form class="mb-0" action="{{ url('player_info') }}" method="post">
       <label class="switch">
         {{ csrf_input }}
-        <input type="checkbox" {{checked if participant.is_player and participant.is_score_public}} id="is_score_public" name="is_score_public">
+        <input type="checkbox" onChange="this.form.submit()" {{checked if participant.is_player and participant.is_score_public}} id="is_score_public" name="is_score_public">
         <span class="slider round"></span>
       </label>
       </form>

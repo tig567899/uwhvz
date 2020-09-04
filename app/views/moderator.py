@@ -196,13 +196,13 @@ class ManageGameView(View):
             msg.send()
 
         if cd['recipients'] == "All":
-            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ALL,game)
+            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],RecipientGroup.ALL,game)
             messages.success(request, "You've sent an email to all players.")
         elif cd['recipients'] == "Zombies":
-            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.ZOMBIE,game)
+            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],RecipientGroup.ZOMBIE,game)
             messages.success(request, "You've sent an email to all zombies.")
         elif cd['recipients'] == "Humans":
-            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],EmailRule.HUMAN,game)
+            email = Email.objects.create_email(f"{subject_set} {cd['subject']}",cd['message'],RecipientGroup.HUMAN,game)
             messages.success(request, "You've sent an email to all humans.")
         elif cd['recipients'] == "Self":
             messages.success(request, "You've sent an email to yourself.")

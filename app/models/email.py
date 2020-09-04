@@ -14,9 +14,9 @@ class RecipientGroup(Enum):
 
 class EmailManager(models.Manager):
     def create_email(self, name: str, data : str, group: RecipientGroup, game: Game, **extra_fields) -> 'Email':
-        email = self.model(name=name, group=group, rule=rule, game=game, **extra_fields)
+        email = self.model(name=name, data=data, group=group, game=game, **extra_fields)
         email.save()
-        return signup_location
+        return email
 
 
 class Email(models.Model):
