@@ -15,8 +15,10 @@
     <div class="ui-card__header">
       <h1 class="ui-card__title">My Code</h1>
     </div>
-    <div class="ui-card__content">
-      <a href="{{ url('player_code') }}" style="color: #000000">{{ participant.code }}</a>
+    <div class="ui-card__header">
+      <h1 class="ui-card__title"><a href="{{ url('player_code') }}">Carry-card PDF</a></h1>
+    </div>
+    <div class="ui-card__content">{{ participant.code }}
     </div>
   </div>
 

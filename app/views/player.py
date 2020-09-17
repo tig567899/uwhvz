@@ -74,7 +74,7 @@ class PlayerCodeView(View):
         # FileResponse sets the Content-Disposition header so that browsers
         # present the option to save the file.
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename=f'{request.user.first_name}_code.pdf')
+        return FileResponse(buffer, filename=f'{request.user.first_name}_code.pdf')
 
 
 @method_decorator(game_required, name='dispatch')
